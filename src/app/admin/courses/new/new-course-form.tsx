@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { createCourse } from "@/actions/content";
 import { FormMessage } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
+import { CoverInput } from "@/components/cover-input";
 
 export function NewCourseForm() {
   const [state, action] = useActionState(createCourse, undefined);
@@ -21,6 +22,7 @@ export function NewCourseForm() {
         <label className="label" htmlFor="course-description">Description</label>
         <textarea className="input" id="course-description" name="description" rows={6} required />
       </div>
+      <CoverInput current="/course-covers/default.svg" />
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="published" defaultChecked /> Publish now (visible to students)
       </label>

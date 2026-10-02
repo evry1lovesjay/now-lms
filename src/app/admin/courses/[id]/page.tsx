@@ -2,17 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { assignTutor, deleteLesson, moveLesson, unassignTutor } from "@/actions/content";
+import { assignTutor, unassignTutor } from "@/actions/content";
 import { SubmitButton } from "@/components/submit-button";
 import { StatusBadge } from "@/components/badges";
 import { CourseForm } from "./course-form";
-import { NewLessonForm } from "./new-lesson-form";
-import { ReplaceVideoButton } from "./replace-video-button";
-
-function formatSize(bytes: number | null) {
-  if (!bytes) return "";
-  return bytes > 1024 * 1024 * 1024 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${(bytes / 1024 ** 2).toFixed(1)} MB`;
-}
+import { LessonManager } from "@/components/lessons/lesson-manager";
 
 export default async function AdminCoursePage({ params }: { params: Promise<{ id: string }> }) {
   await requireUser(["SUPERADMIN", "CONTENT_ADMIN"]);
@@ -49,48 +43,9 @@ export default async function AdminCoursePage({ params }: { params: Promise<{ id
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <section className="card space-y-4 lg:col-span-2">
-          <h3 className="font-semibold">Lessons</h3>
-          {course.lessons.length === 0 && <p className="text-sm text-slate-500">No lessons yet. Add the first one below.</p>}
-          <ol className="divide-y divide-slate-100">
-            {course.lessons.map((lesson, i) => (
-              <li key={lesson.id} className="flex flex-wrap items-center gap-3 py-3">
-                <span className="w-6 text-sm text-slate-400">{i + 1}</span>
-                <div className="min-w-0 flex-1">
-                  <Link href={`/courses/${course.slug}/lessons/${lesson.id}`} className="font-medium hover:text-brand-700">
-                    {lesson.title}
-                  </Link>
-                  <p className="text-xs text-slate-500">
-                    {lesson.videoKey ? `Video · ${formatSize(lesson.videoSize)}` : "No video uploaded"}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  <form action={moveLesson}>
-                    <input type="hidden" name="lessonId" value={lesson.id} />
-                    <input type="hidden" name="direction" value="up" />
-                    <button className="btn-secondary px-2 py-1" disabled={i === 0} aria-label="Move up">↑</button>
-                  </form>
-                  <form action={moveLesson}>
-                    <input type="hidden" name="lessonId" value={lesson.id} />
-                    <input type="hidden" name="direction" value="down" />
-                    <button className="btn-secondary px-2 py-1" disabled={i === course.lessons.length - 1} aria-label="Move down">↓</button>
-                  </form>
-                  <ReplaceVideoButton lessonId={lesson.id} hasVideo={!!lesson.videoKey} />
-                  <form action={deleteLesson}>
-                    <input type="hidden" name="lessonId" value={lesson.id} />
-                    <SubmitButton className="btn-danger px-3 py-1" pendingText="…" confirm={`Delete "${lesson.title}" and its video?`}>
-                      Delete
-                    </SubmitButton>
-                  </form>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <div className="border-t border-slate-200 pt-4">
-            <h4 className="mb-3 font-medium">Add a lesson</h4>
-            <NewLessonForm courseId={course.id} />
-          </div>
-        </section>
+        <div className="lg:col-span-2">
+          <LessonManager course={course} lessons={course.lessons} />
+        </div>
 
         <div className="space-y-6">
           <section className="card space-y-3">

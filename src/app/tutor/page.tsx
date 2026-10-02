@@ -62,6 +62,9 @@ export default async function TutorDashboard() {
               <Link href={`/courses/${course.slug}`} className="btn-secondary">
                 Course page
               </Link>
+              <Link href={`/courses/${course.slug}/manage`} className="btn-secondary">
+                Manage lessons
+              </Link>
               <Link href={`/courses/${course.slug}/assignments`} className="btn-secondary">
                 Assignments ({course._count.assignments})
                 {(toGrade.get(course.id) ?? 0) > 0 && (

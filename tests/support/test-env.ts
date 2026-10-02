@@ -7,6 +7,7 @@ export const testEnv = {
   DATABASE_URL: "file:./test.db",
   VIDEO_STORAGE_DIR: "./storage/test-videos",
   DOCUMENT_STORAGE_DIR: "./storage/test-documents",
+  COVER_STORAGE_DIR: "./storage/test-covers",
   AUTH_SECRET: "e2e-test-secret-that-is-at-least-32-characters-long",
   SEED_SUPERADMIN_EMAIL: "superadmin@nowlms.local",
   SEED_SUPERADMIN_PASSWORD: "ChangeMe123!",

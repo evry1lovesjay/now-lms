@@ -11,7 +11,7 @@ describe("Course creation", () => {
     cy.get("#course-description").type("AWS, containers and infrastructure as code.");
     cy.contains("button", "Create course").click();
 
-    cy.location("pathname").should("match", /^\/admin\/courses\/[^/]+$/);
+    cy.location("pathname").should("match", /^\/admin\/courses\/(?!new$)[^/]+$/);
     cy.contains("h2", "Cloud Engineering");
 
     cy.visit("/");
@@ -33,7 +33,7 @@ describe("Course creation", () => {
       cy.get("#course-summary").type("Protect systems and data.");
       cy.get("#course-description").type("Threats, defence and incident response.");
       cy.contains("button", "Create course").click();
-      cy.location("pathname").should("match", /^\/admin\/courses\/[^/]+$/);
+      cy.location("pathname").should("match", /^\/admin\/courses\/(?!new$)[^/]+$/);
     });
     cy.visit("/courses/cyber-security");
     cy.contains("h1", "Cyber Security");

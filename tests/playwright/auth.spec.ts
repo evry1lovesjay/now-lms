@@ -12,7 +12,7 @@ test("visitor can register as a student and lands on the student dashboard", asy
 
   await expect(page).toHaveURL(/\/student$/);
   await expect(page.getByRole("heading", { name: /Hi New/ })).toBeVisible();
-  await expect(page.getByText("New Learner · Student")).toBeVisible();
+  await expect(page.getByTestId("nav-user")).toHaveText(/^New\s*Student$/);
 });
 
 test("registering with an existing email is rejected", async ({ page }) => {

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Product management illustration">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f97316"/><stop offset="1" stop-color="#e11d48"/></linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#bg)"/>
+  <circle cx="600" cy="40" r="110" fill="#fff" opacity=".07"/>
+  <circle cx="30" cy="320" r="90" fill="#fff" opacity=".06"/>
+  <!-- roadmap -->
+  <path d="M70 92h500" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".85" stroke-dasharray="2 16"/>
+  <g fill="#fff"><circle cx="110" cy="92" r="14"/><circle cx="250" cy="92" r="14"/><circle cx="390" cy="92" r="14"/></g>
+  <circle cx="530" cy="92" r="16" fill="#fde68a"/>
+  <path d="M523 92l5 5 10-11" stroke="#be123c" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- kanban board -->
+  <g>
+    <rect x="70" y="134" width="150" height="190" rx="14" fill="#fff" opacity=".92"/>
+    <rect x="245" y="134" width="150" height="190" rx="14" fill="#fff" opacity=".92"/>
+    <rect x="420" y="134" width="150" height="190" rx="14" fill="#fff" opacity=".92"/>
+    <rect x="88" y="150" width="60" height="10" rx="5" fill="#fdba74"/>
+    <rect x="263" y="150" width="70" height="10" rx="5" fill="#fda4af"/>
+    <rect x="438" y="150" width="50" height="10" rx="5" fill="#86efac"/>
+  </g>
+  <g fill="#fff7ed" stroke="#fed7aa" stroke-width="2">
+    <rect x="86" y="174" width="118" height="44" rx="8"/><rect x="86" y="228" width="118" height="44" rx="8"/>
+  </g>
+  <g fill="#fff1f2" stroke="#fecdd3" stroke-width="2"><rect x="261" y="174" width="118" height="44" rx="8"/></g>
+  <g fill="#f0fdf4" stroke="#bbf7d0" stroke-width="2">
+    <rect x="436" y="174" width="118" height="44" rx="8"/><rect x="436" y="228" width="118" height="44" rx="8"/><rect x="436" y="282" width="118" height="30" rx="8"/>
+  </g>
+  <g fill="#cbd5e1">
+    <rect x="98" y="186" width="80" height="7" rx="3.5"/><rect x="98" y="240" width="64" height="7" rx="3.5"/>
+    <rect x="273" y="186" width="90" height="7" rx="3.5"/>
+    <rect x="448" y="186" width="70" height="7" rx="3.5"/><rect x="448" y="240" width="86" height="7" rx="3.5"/>
+  </g>
+  <g fill="#fb923c"><circle cx="190" cy="205" r="6"/><circle cx="365" cy="205" r="6" fill="#f43f5e"/><circle cx="540" cy="205" r="6" fill="#22c55e"/></g>
+</svg>

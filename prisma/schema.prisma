@@ -46,6 +46,9 @@ model Course {
   summary     String
   description String
   published   Boolean  @default(true)
+  // Public URL of the cover image: a built-in illustration (/course-covers/*.svg)
+  // or an uploaded, compressed cover (/api/course-covers/<id>?v=…). Null → default.
+  coverImage  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

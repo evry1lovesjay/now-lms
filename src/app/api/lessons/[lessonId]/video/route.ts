@@ -2,21 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { canManageContent } from "@/lib/roles";
+import { canTeachCourse } from "@/lib/access";
 import { audit } from "@/lib/audit";
 import { ALLOWED_VIDEO_TYPES, UploadTooLargeError, deleteVideo, maxVideoBytes, saveVideo } from "@/lib/storage";
 
 export const runtime = "nodejs";
 
 /**
- * Upload (or replace) a lesson's video. The raw file is sent as the request
- * body and streamed straight to storage, so large files are never held in memory.
+ * Upload (or replace) a lesson's video. Allowed for admins and the course's tutors.
+ * The raw file is sent as the request body and streamed straight to storage, so
+ * large files are never held in memory.
  */
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ lessonId: string }> }) {
   const { lessonId } = await params;
 
   const user = await getCurrentUser();
-  if (!user || !canManageContent(user.role)) {
+  if (!user) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
+
+  const lesson = await db.lesson.findUnique({ where: { id: lessonId }, select: { id: true, courseId: true, videoKey: true } });
+  if (!lesson) return NextResponse.json({ error: "Lesson not found." }, { status: 404 });
+  if (!(await canTeachCourse(user, lesson.courseId))) {
     return NextResponse.json({ error: "Not allowed." }, { status: 403 });
   }
 
@@ -31,9 +36,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   if (!request.body) {
     return NextResponse.json({ error: "Empty upload." }, { status: 400 });
   }
-
-  const lesson = await db.lesson.findUnique({ where: { id: lessonId }, select: { id: true, courseId: true, videoKey: true } });
-  if (!lesson) return NextResponse.json({ error: "Lesson not found." }, { status: 404 });
 
   let saved;
   try {
@@ -51,5 +53,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   await audit(user.id, "lesson.video.upload", lesson.id, `${saved.size} bytes`);
 
   revalidatePath("/admin/courses", "layout");
+  revalidatePath("/courses", "layout");
   return NextResponse.json({ ok: true });
 }

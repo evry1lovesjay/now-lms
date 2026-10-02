@@ -5,7 +5,7 @@ const section = (key: string) => cy.get(`[data-section="${key}"]`);
 
 describe("Course outline, materials & resources", () => {
   it("offers exactly the three sections, and resources only take links", () => {
-    cy.login("tutor");
+    cy.login("contentAdmin");
     cy.visit(SQA);
     cy.get("#content-section option:not([disabled])").then(($o) => {
       expect([...$o].map((o) => o.textContent)).to.deep.equal(["📋 Course outline", "📚 Course materials", "🔗 Resources"]);
@@ -16,8 +16,8 @@ describe("Course outline, materials & resources", () => {
     cy.contains("label", "Upload a file").should("exist");
   });
 
-  it("lets the assigned tutor post; learners see colour-coded sections above the lessons", () => {
-    cy.login("tutor");
+  it("lets admins post; learners see colour-coded sections above the lessons", () => {
+    cy.login("contentAdmin");
     cy.visit(SQA);
     cy.postContent("OUTLINE", { title: "SQA syllabus", file: PDF });
     cy.postContent("MATERIALS", { title: "Testing handbook", url: "https://example.com/handbook" });
@@ -67,10 +67,11 @@ describe("Course outline, materials & resources", () => {
     });
   });
 
-  it("only lets tutors post to their own courses and rejects unsafe links", () => {
+  it("keeps tutors from posting course content and rejects unsafe links", () => {
     cy.login("contentAdmin");
     cy.visit("/admin/courses");
-    cy.contains("a", "Data Analytics")
+    // The tutor's own course: even there, outline/materials/resources are admin-only.
+    cy.contains("a", "Software Quality Assurance")
       .invoke("attr", "href")
       .then((href) => {
         const courseId = String(href).split("/").pop();
@@ -87,6 +88,9 @@ describe("Course outline, materials & resources", () => {
 
         cy.logoutAll();
         cy.login("tutor");
+        // Demo Tutor is assigned to SQA, but outline/materials/resources are admin-only.
+        cy.visit("/courses/software-quality-assurance");
+        cy.get('[data-testid="content-composer"]').should("not.exist");
         cy.visit("/courses/data-analytics");
         cy.get('[data-testid="content-composer"]').should("not.exist");
         post("Sneaky", "https://example.com").its("status").should("eq", 403);

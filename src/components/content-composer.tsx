@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { SECTIONS, type SectionKey } from "@/lib/course-content";
 import { MAX_DOCUMENT_MB, acceptAttr } from "@/lib/file-types";
 
-/** Lets admins and the course's tutors post to the course outline, materials or resources. */
+/** Lets super admins and content admins post to the course outline, materials or resources. */
 export function ContentComposer({ courseId }: { courseId: string }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);

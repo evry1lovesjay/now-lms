@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Course illustration">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#1e3a8a"/></linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#bg)"/>
+  <circle cx="580" cy="60" r="120" fill="#fff" opacity=".07"/>
+  <circle cx="60" cy="320" r="90" fill="#fff" opacity=".06"/>
+  <!-- open book -->
+  <path d="M320 120c-50-30-120-34-170-20v170c50-14 120-10 170 20z" fill="#fff"/>
+  <path d="M320 120c50-30 120-34 170-20v170c-50-14-120-10-170 20z" fill="#e0e7ff"/>
+  <path d="M320 120v170" stroke="#a5b4fc" stroke-width="4"/>
+  <g stroke="#c7d2fe" stroke-width="6" stroke-linecap="round" fill="none">
+    <path d="M180 140c35-8 75-6 110 8M180 170c35-8 75-6 110 8M180 200c35-8 75-6 110 8M180 230c35-8 75-6 90 6"/>
+  </g>
+  <g stroke="#a5b4fc" stroke-width="6" stroke-linecap="round" fill="none">
+    <path d="M350 148c35-14 75-16 110-8M350 178c35-14 75-16 110-8M350 208c35-14 75-16 110-8"/>
+  </g>
+  <!-- graduation cap -->
+  <path d="M320 40l90 34-90 34-90-34z" fill="#fde68a"/>
+  <path d="M270 88v26c30 18 70 18 100 0V88l-50 20z" fill="#fcd34d"/>
+  <path d="M404 76v40" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="404" cy="120" r="7" fill="#fde68a"/>
+</svg>

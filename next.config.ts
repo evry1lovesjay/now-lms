@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   serverExternalPackages: ["better-sqlite3", "@prisma/adapter-better-sqlite3"],
   poweredByHeader: false,
+  // Course forms carry an optional cover image (max 5 MB, compressed on the server).
+  experimental: {
+    serverActions: { bodySizeLimit: "6mb" },
+  },
   async headers() {
     return [
       {

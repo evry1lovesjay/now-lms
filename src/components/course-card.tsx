@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { coverUrl } from "@/lib/course-cover";
 
 const PALETTE = [
   "from-emerald-500 to-teal-600",
@@ -11,7 +12,7 @@ const PALETTE = [
   "from-cyan-500 to-sky-600",
 ];
 
-/** Original courses keep their colours; new courses get a stable colour from their slug. */
+/** Placeholder colour behind the cover: original courses keep theirs; new courses get a stable one from their slug. */
 function accentFor(slug: string) {
   if (ACCENTS[slug]) return ACCENTS[slug];
   let hash = 0;
@@ -30,12 +31,25 @@ export function CourseCard({
   course,
   footer,
 }: {
-  course: { slug: string; title: string; summary: string; _count?: { lessons: number } };
+  course: { slug: string; title: string; summary: string; coverImage: string | null; _count?: { lessons: number } };
   footer?: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-surface shadow-sm">
-      <div className={`h-24 bg-gradient-to-br ${accentFor(course.slug)}`} />
+      {/* The gradient shows while the (small, pre-sized) cover loads. */}
+      <Link href={`/courses/${course.slug}`} tabIndex={-1} aria-hidden className={`block bg-gradient-to-br ${accentFor(course.slug)}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- covers are pre-sized WebP/SVG */}
+        <img
+          src={coverUrl(course)}
+          alt=""
+          width={640}
+          height={360}
+          loading="lazy"
+          decoding="async"
+          className="aspect-video w-full object-cover"
+          data-testid="course-cover"
+        />
+      </Link>
       <div className="flex flex-1 flex-col gap-2 p-5">
         <Link href={`/courses/${course.slug}`} className="text-lg font-semibold hover:text-brand-700">
           {course.title}
