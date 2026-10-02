@@ -22,7 +22,7 @@ export async function login(_prev: ActionState, formData: FormData): Promise<Act
   if (!user || !valid || !isRole(user.role)) return { error: "Invalid email or password." };
   if (user.status !== "ACTIVE") return { error: "This account has been disabled. Contact an administrator." };
 
-  await createSession(user.id);
+  await createSession(user.id, user.sessionVersion);
   redirect(homePathFor(user.role));
 }
 
@@ -49,7 +49,7 @@ export async function register(_prev: ActionState, formData: FormData): Promise<
     },
   });
 
-  await createSession(user.id);
+  await createSession(user.id, user.sessionVersion);
   redirect("/student");
 }
 

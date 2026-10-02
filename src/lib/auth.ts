@@ -17,8 +17,8 @@ export type SessionUser = {
   role: Role;
 };
 
-export async function createSession(userId: string) {
-  const token = await signToken({ sub: userId }, `${SESSION_DAYS}d`, SESSION_AUDIENCE);
+export async function createSession(userId: string, sessionVersion: number) {
+  const token = await signToken({ sub: userId, v: sessionVersion }, `${SESSION_DAYS}d`, SESSION_AUDIENCE);
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -35,18 +35,20 @@ export async function destroySession() {
 /**
  * Resolves the signed-in user, re-reading them from the database on every
  * request so that blocking an account takes effect immediately.
- * Returns null for missing/invalid sessions and for blocked accounts.
+ * Returns null for missing/invalid sessions, blocked accounts, and sessions
+ * issued before the account was last blocked.
  */
 export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  const payload = await verifyToken<{ sub?: string }>(token, SESSION_AUDIENCE);
+  const payload = await verifyToken<{ sub?: string; v?: number }>(token, SESSION_AUDIENCE);
   if (!payload?.sub) return null;
 
   const user = await db.user.findUnique({
     where: { id: payload.sub },
-    select: { id: true, name: true, email: true, role: true, status: true },
+    select: { id: true, name: true, email: true, role: true, status: true, sessionVersion: true },
   });
   if (!user || user.status !== "ACTIVE" || !isRole(user.role)) return null;
+  if ((payload.v ?? 0) !== user.sessionVersion) return null;
 
   return { id: user.id, name: user.name, email: user.email, role: user.role };
 });

@@ -9,3 +9,11 @@ src/generated/
 next-env.d.ts
 *.tsbuildinfo
 .DS_Store
+
+# test output
+test-results/
+playwright-report/
+blob-report/
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/

@@ -54,7 +54,7 @@ export async function setUserStatus(formData: FormData) {
   await db.user.update({
     where: { id: target.id },
     data: block
-      ? { status: "BLOCKED", blockedAt: new Date(), blockedById: actor.id }
+      ? { status: "BLOCKED", blockedAt: new Date(), blockedById: actor.id, sessionVersion: { increment: 1 } }
       : { status: "ACTIVE", blockedAt: null, blockedById: null },
   });
   await audit(actor.id, block ? "user.block" : "user.unblock", target.id);

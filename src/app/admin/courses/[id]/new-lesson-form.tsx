@@ -42,16 +42,16 @@ export function NewLessonForm({ courseId }: { courseId: string }) {
     <form ref={formRef} onSubmit={onSubmit} className="space-y-3">
       <input type="hidden" name="courseId" value={courseId} />
       <div>
-        <label className="label" htmlFor="title">Lesson title</label>
-        <input className="input" id="title" name="title" required />
+        <label className="label" htmlFor="lesson-title">Lesson title</label>
+        <input className="input" id="lesson-title" name="title" required />
       </div>
       <div>
-        <label className="label" htmlFor="description">Description</label>
-        <textarea className="input" id="description" name="description" rows={3} />
+        <label className="label" htmlFor="lesson-description">Description</label>
+        <textarea className="input" id="lesson-description" name="description" rows={3} />
       </div>
       <div>
-        <label className="label" htmlFor="video">Video (MP4, WebM, OGG or MOV)</label>
-        <input className="input" id="video" name="video" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime" />
+        <label className="label" htmlFor="lesson-video">Video (MP4, WebM, OGG or MOV)</label>
+        <input className="input" id="lesson-video" name="video" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime" />
       </div>
       {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {progress !== null && (

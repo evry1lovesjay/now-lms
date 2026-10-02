@@ -14,21 +14,23 @@ datasource db {
 // role:   SUPERADMIN | CONTENT_ADMIN | TUTOR | STUDENT
 // status: ACTIVE | BLOCKED
 model User {
-  id           String    @id @default(cuid())
-  name         String
-  email        String    @unique
-  passwordHash String
-  role         String    @default("STUDENT")
-  status       String    @default("ACTIVE")
-  blockedAt    DateTime?
-  blockedById  String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  name           String
+  email          String    @unique
+  passwordHash   String
+  role           String    @default("STUDENT")
+  status         String    @default("ACTIVE")
+  // Bumped when an account is blocked so every existing session is revoked.
+  sessionVersion Int       @default(0)
+  blockedAt      DateTime?
+  blockedById    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  enrollments  Enrollment[]
-  tutoring     CourseTutor[]
-  progress     LessonProgress[]
-  auditLogs    AuditLog[]       @relation("actor")
+  enrollments Enrollment[]
+  tutoring    CourseTutor[]
+  progress    LessonProgress[]
+  auditLogs   AuditLog[]       @relation("actor")
 
   @@index([role, status])
 }
@@ -61,8 +63,8 @@ model Lesson {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  progress    LessonProgress[]
+  course   Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
 
   @@index([courseId, position])
 }
@@ -73,8 +75,8 @@ model Enrollment {
   courseId  String
   createdAt DateTime @default(now())
 
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
   @@index([courseId])
@@ -86,8 +88,8 @@ model CourseTutor {
   courseId  String
   createdAt DateTime @default(now())
 
-  tutor     User   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
-  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  tutor  User   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([tutorId, courseId])
   @@index([courseId])
@@ -99,8 +101,8 @@ model LessonProgress {
   lessonId    String
   completedAt DateTime @default(now())
 
-  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson      Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
 }
@@ -113,7 +115,7 @@ model AuditLog {
   detail    String?
   createdAt DateTime @default(now())
 
-  actor     User @relation("actor", fields: [actorId], references: [id], onDelete: Cascade)
+  actor User @relation("actor", fields: [actorId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
 }

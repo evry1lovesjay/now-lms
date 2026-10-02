@@ -55,6 +55,40 @@ Seeded accounts:
 
 **Change the super admin password / env values before deploying.** Demo accounts are not seeded when `NODE_ENV=production`.
 
+## Testing
+
+End-to-end tests run in **both Playwright and Cypress** against a production build that uses a separate database (`test.db`) and video folder (`storage/test-videos`), so your dev data is never touched. The database is reset and re-seeded before every test, including a lesson with a real video (`tests/fixtures/sample.webm`).
+
+```bash
+npm run build                 # tests run against the production build
+npx playwright install chromium   # first time only
+npm run test:playwright       # Playwright (starts the test server itself)
+npm run test:cypress          # Cypress (headless; starts the test server itself)
+npm run test:e2e              # both
+npm run cypress:open          # Cypress UI — run `npm run test:server` in another terminal first
+```
+
+Both suites cover the same scenarios:
+
+| Spec | What it checks |
+|---|---|
+| `auth` | Student sign-up, login errors, role-based dashboards, anonymous/role redirects, audit log is super-admin only |
+| `user-management` | Who can block whom, which roles each admin can create, blocking signs users out immediately and unblocking doesn't revive old sessions, status filter, audit entries |
+| `courses` | The 4 courses, lesson create/upload/reorder/delete, tutor assignment, enroll → watch → complete, tutor sees progress |
+| `video-protection` | Range streaming with no-store headers, direct-tab access refused, signed-out and copied links refused, non-enrolled students kept out, blocking cuts the stream |
+
+```
+tests/
+  fixtures/sample.webm    # small video used by uploads and the seeded lesson
+  support/                # shared test env, seeded accounts, DB reset, test server
+  playwright/*.spec.ts    # Playwright suite (playwright.config.ts)
+cypress/
+  e2e/*.cy.ts             # Cypress suite (cypress.config.ts)
+  support/                # cy.login(), cy.userRow(), cy.enrollInSqa(), … + per-test DB reset
+```
+
+CI (`.github/workflows/e2e.yml`) runs type-checking, the build and both suites on every pull request.
+
 ## Project structure
 
 ```
@@ -93,7 +127,8 @@ src/
 |---|---|
 | `npm run dev` | Start the dev server |
 | `npm run build` / `npm start` | Production build / serve |
-| `npm run lint` | Type-check |
+| `npm run lint` | Type-check (app, Playwright and Cypress code) |
+| `npm run test:e2e` | Run the Playwright and Cypress suites |
 | `npm run setup` | Generate client, push schema, seed |
 | `npm run db:migrate` | Create a migration (use for Postgres in production) |
 | `npm run db:seed` | Re-run the seed (idempotent) |
