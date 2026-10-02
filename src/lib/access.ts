@@ -20,3 +20,13 @@ export async function canAccessCourse(user: SessionUser, courseId: string): Prom
     select: { id: true },
   }));
 }
+
+/** Can this user manage course content and assignments? Admins always; tutors for their assigned courses. */
+export async function canTeachCourse(user: SessionUser, courseId: string): Promise<boolean> {
+  if (canManageContent(user.role)) return true;
+  if (user.role !== "TUTOR") return false;
+  return !!(await db.courseTutor.findUnique({
+    where: { tutorId_courseId: { tutorId: user.id, courseId } },
+    select: { id: true },
+  }));
+}

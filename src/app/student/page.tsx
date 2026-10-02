@@ -25,6 +25,9 @@ export default async function StudentDashboard() {
         <h1 className="text-2xl font-semibold">Hi {user.name.split(" ")[0]} 👋</h1>
         <p className="text-slate-600">Pick up where you left off.</p>
       </div>
+      <Link href="/student/assignments" className="btn-secondary">
+        📝 My assignments & grades
+      </Link>
 
       {enrollments.length === 0 ? (
         <div className="card text-center">

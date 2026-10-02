@@ -11,7 +11,7 @@ export default async function TutorDashboard() {
     include: {
       course: {
         include: {
-          _count: { select: { lessons: true } },
+          _count: { select: { lessons: true, assignments: true } },
           enrollments: {
             orderBy: { createdAt: "desc" },
             include: {
@@ -31,11 +31,18 @@ export default async function TutorDashboard() {
     },
   });
 
+  const ungraded = await db.submission.findMany({
+    where: { gradedAt: null, assignment: { courseId: { in: assignments.map((a) => a.course.id) } } },
+    select: { assignment: { select: { courseId: true } } },
+  });
+  const toGrade = new Map<string, number>();
+  for (const { assignment } of ungraded) toGrade.set(assignment.courseId, (toGrade.get(assignment.courseId) ?? 0) + 1);
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Tutor dashboard</h1>
-        <p className="text-slate-600">Your courses and how your students are progressing.</p>
+        <p className="text-slate-600">Your courses, assignments to grade, and how your students are progressing.</p>
       </div>
 
       {assignments.length === 0 && (
@@ -51,9 +58,19 @@ export default async function TutorDashboard() {
                 {course._count.lessons} lessons · {course.enrollments.length} students
               </p>
             </div>
-            <Link href={`/courses/${course.slug}`} className="btn-secondary">
-              View lessons
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link href={`/courses/${course.slug}`} className="btn-secondary">
+                Course page
+              </Link>
+              <Link href={`/courses/${course.slug}/assignments`} className="btn-secondary">
+                Assignments ({course._count.assignments})
+                {(toGrade.get(course.id) ?? 0) > 0 && (
+                  <span className="badge bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200">
+                    {toGrade.get(course.id)} to grade
+                  </span>
+                )}
+              </Link>
+            </div>
           </div>
           {course.enrollments.length === 0 ? (
             <p className="text-sm text-slate-500">No students enrolled yet.</p>

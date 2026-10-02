@@ -27,10 +27,14 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  enrollments Enrollment[]
-  tutoring    CourseTutor[]
-  progress    LessonProgress[]
-  auditLogs   AuditLog[]       @relation("actor")
+  enrollments  Enrollment[]
+  tutoring     CourseTutor[]
+  progress     LessonProgress[]
+  auditLogs    AuditLog[]       @relation("actor")
+  contentItems CourseContent[]
+  assignments  Assignment[]
+  submissions  Submission[]     @relation("student")
+  gradings     Submission[]     @relation("grader")
 
   @@index([role, status])
 }
@@ -48,6 +52,8 @@ model Course {
   lessons     Lesson[]
   enrollments Enrollment[]
   tutors      CourseTutor[]
+  content     CourseContent[]
+  assignments Assignment[]
 }
 
 model Lesson {
@@ -118,4 +124,70 @@ model AuditLog {
   actor User @relation("actor", fields: [actorId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
+}
+
+// An item in one of the three fixed course sections shown above the lessons.
+// section: OUTLINE | MATERIALS | RESOURCES (fixed for every course, see src/lib/course-content.ts)
+// kind:    LINK | FILE
+model CourseContent {
+  id          String   @id @default(cuid())
+  courseId    String
+  section     String
+  kind        String
+  title       String
+  url         String?
+  fileKey     String?
+  fileName    String?
+  fileType    String?
+  fileSize    Int?
+  createdById String
+  createdAt   DateTime @default(now())
+
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdBy User   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([courseId, section, createdAt])
+}
+
+model Assignment {
+  id           String    @id @default(cuid())
+  courseId     String
+  title        String
+  instructions String
+  dueAt        DateTime?
+  maxScore     Int       @default(100)
+  createdById  String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdBy   User         @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  submissions Submission[]
+
+  @@index([courseId, createdAt])
+}
+
+// One submission per student per assignment. Students can resubmit until it is graded.
+model Submission {
+  id           String    @id @default(cuid())
+  assignmentId String
+  studentId    String
+  text         String    @default("")
+  linkUrl      String?
+  fileKey      String?
+  fileName     String?
+  fileType     String?
+  fileSize     Int?
+  submittedAt  DateTime  @default(now())
+  score        Int?
+  feedback     String?
+  gradedAt     DateTime?
+  gradedById   String?
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User       @relation("student", fields: [studentId], references: [id], onDelete: Cascade)
+  gradedBy   User?      @relation("grader", fields: [gradedById], references: [id], onDelete: SetNull)
+
+  @@unique([assignmentId, studentId])
+  @@index([studentId])
 }

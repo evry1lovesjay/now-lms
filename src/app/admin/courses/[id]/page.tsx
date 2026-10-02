@@ -38,9 +38,14 @@ export default async function AdminCoursePage({ params }: { params: Promise<{ id
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">{course.title}</h2>
-        <Link href={`/courses/${course.slug}`} className="btn-secondary">
-          View as learner
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href={`/courses/${course.slug}`} className="btn-secondary">
+            Outline, materials & resources
+          </Link>
+          <Link href={`/courses/${course.slug}/assignments`} className="btn-secondary">
+            Assignments
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

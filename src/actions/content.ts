@@ -1,11 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { audit } from "@/lib/audit";
-import { deleteVideo } from "@/lib/storage";
+import { canTeachCourse } from "@/lib/access";
+import { deleteDocument, deleteVideo } from "@/lib/storage";
 import type { ActionState } from "./types";
 
 const CONTENT_ROLES = ["SUPERADMIN", "CONTENT_ADMIN"] as const;
@@ -110,4 +112,53 @@ export async function unassignTutor(formData: FormData) {
   await db.courseTutor.deleteMany({ where: { tutorId, courseId } });
   await audit(actor.id, "course.tutor.unassign", courseId, tutorId);
   refresh(courseId);
+}
+
+const newCourseSchema = z.object({
+  title: z.string().trim().min(2, "Enter a course title.").max(120),
+  summary: z.string().trim().min(2, "Enter a short summary.").max(300),
+  description: z.string().trim().min(2, "Enter a description.").max(5000),
+  published: z.literal("on").optional(),
+});
+
+function slugify(title: string) {
+  return (
+    title
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "course"
+  );
+}
+
+/** Super admins and content admins can create courses. New courses get the same fixed sections as every other course. */
+export async function createCourse(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const actor = await requireUser(CONTENT_ROLES);
+  const parsed = newCourseSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  const { title, summary, description, published } = parsed.data;
+  const base = slugify(title);
+  let slug = base;
+  for (let n = 2; await db.course.findUnique({ where: { slug }, select: { id: true } }); n++) slug = `${base}-${n}`;
+
+  const course = await db.course.create({ data: { slug, title, summary, description, published: !!published } });
+  await audit(actor.id, "course.create", course.id, title);
+  revalidatePath("/", "layout");
+  redirect(`/admin/courses/${course.id}`);
+}
+
+/** Remove an item from a course section. Allowed for anyone who can teach the course. */
+export async function deleteCourseContent(formData: FormData) {
+  const actor = await requireUser(["SUPERADMIN", "CONTENT_ADMIN", "TUTOR"]);
+  const id = String(formData.get("contentId") ?? "");
+  const item = await db.courseContent.findUnique({ where: { id }, include: { course: { select: { slug: true } } } });
+  if (!item) return;
+  if (!(await canTeachCourse(actor, item.courseId))) throw new Error("Not allowed.");
+
+  await db.courseContent.delete({ where: { id } });
+  await deleteDocument(item.fileKey);
+  await audit(actor.id, "course.content.delete", item.courseId, `${item.section}: ${item.title}`);
+  revalidatePath(`/courses/${item.course.slug}`);
 }

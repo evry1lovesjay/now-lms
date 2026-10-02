@@ -31,7 +31,11 @@ export function acceptNextDialog(page: Page) {
 }
 
 export async function enrollInSqa(page: Page) {
-  await page.goto("/courses/software-quality-assurance");
+  await enrollIn(page, "software-quality-assurance");
+}
+
+export async function enrollIn(page: Page, slug: string) {
+  await page.goto(`/courses/${slug}`);
   await page.getByRole("button", { name: "Enroll in this course" }).click();
   await expect(page.getByRole("button", { name: "Enroll in this course" })).toHaveCount(0);
 }
