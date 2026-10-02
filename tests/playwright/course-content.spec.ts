@@ -107,7 +107,7 @@ test("tutors cannot post course content, even to their own course; unsafe links 
   const adminPage = await admin.newPage();
   await login(adminPage, "contentAdmin");
   await adminPage.goto("/admin/courses");
-  const href = await adminPage.getByRole("link", { name: /Software Quality Assurance/ }).getAttribute("href");
+  const href = await adminPage.getByRole("main").getByRole("link", { name: /Software Quality Assurance/ }).getAttribute("href");
   const courseId = href!.split("/").pop();
 
   const res = await page.request.post(`/api/courses/${courseId}/content`, {

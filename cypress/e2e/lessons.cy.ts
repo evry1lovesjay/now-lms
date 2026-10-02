@@ -69,7 +69,7 @@ describe("Lessons", () => {
   it("lets admins edit lessons from the admin course page", () => {
     cy.login("contentAdmin");
     cy.visit("/admin/courses");
-    cy.contains("a", "Software Quality Assurance").click();
+    cy.get("main").contains("a", "Software Quality Assurance").click();
     lesson(SEEDED_LESSON_TITLE).within(() => {
       cy.contains("button", "Edit").click();
       cy.get('input[name="title"]').clear().type("Welcome to QA");

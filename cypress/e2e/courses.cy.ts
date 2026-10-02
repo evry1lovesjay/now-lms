@@ -3,13 +3,13 @@ import { accounts, COURSE_TITLES, SEEDED_LESSON_TITLE } from "../../tests/suppor
 describe("Courses & learning", () => {
   it("lists the four courses on the home page", () => {
     cy.visit("/");
-    COURSE_TITLES.forEach((title) => cy.contains("a", title));
+    COURSE_TITLES.forEach((title) => cy.get("main").contains("a", title));
   });
 
   it("lets a content admin add, reorder and delete lessons with video upload", () => {
     cy.login("contentAdmin");
     cy.visit("/admin/courses");
-    cy.contains("a", "Data Analytics").click();
+    cy.get("main").contains("a", "Data Analytics").click();
 
     cy.get("#lesson-title").type("SQL basics");
     cy.get("#lesson-description").type("SELECT * FROM learning");
@@ -31,7 +31,7 @@ describe("Courses & learning", () => {
   it("lets a content admin assign a tutor, who then sees the course", () => {
     cy.login("contentAdmin");
     cy.visit("/admin/courses");
-    cy.contains("a", "Product Design").click();
+    cy.get("main").contains("a", "Product Design").click();
     cy.get("select[name=tutorId]").select(`Demo Tutor (${accounts.tutor.email})`);
     cy.contains("button", "Assign").click();
     cy.contains("li", accounts.tutor.email);

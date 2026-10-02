@@ -8,14 +8,14 @@ test.beforeEach(() => resetDb());
 test("home page lists the four courses", async ({ page }) => {
   await page.goto("/");
   for (const title of COURSE_TITLES) {
-    await expect(page.getByRole("link", { name: title })).toBeVisible();
+    await expect(page.getByRole("main").getByRole("link", { name: title })).toBeVisible();
   }
 });
 
 test("content admin adds a lesson with a video, reorders it and deletes it", async ({ page }) => {
   await login(page, "contentAdmin");
   await page.goto("/admin/courses");
-  await page.getByRole("link", { name: /Data Analytics/ }).click();
+  await page.getByRole("main").getByRole("link", { name: /Data Analytics/ }).click();
 
   await page.getByLabel("Lesson title").fill("SQL basics");
   await page.locator("#lesson-description").fill("SELECT * FROM learning");
@@ -40,7 +40,7 @@ test("content admin adds a lesson with a video, reorders it and deletes it", asy
 test("content admin assigns a tutor to a course", async ({ page }) => {
   await login(page, "contentAdmin");
   await page.goto("/admin/courses");
-  await page.getByRole("link", { name: /Product Design/ }).click();
+  await page.getByRole("main").getByRole("link", { name: /Product Design/ }).click();
 
   await page.locator("select[name=tutorId]").selectOption({ label: `Demo Tutor (${accounts.tutor.email})` });
   await page.getByRole("button", { name: "Assign" }).click();

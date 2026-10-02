@@ -6,6 +6,8 @@ Courses offered: **Software Quality Assurance**, **Data Analytics**, **Product M
 
 Light and dark themes are built in: pick System, Light or Dark from the account menu (click your name in the header; on phones, the ☰ menu). The choice is remembered per browser. Signed-out visitors get a compact theme button.
 
+Every page ends with a footer: the published courses, account links (Log in / Register, or your dashboard when signed in), About, Contact & support, Privacy policy and Terms of use pages, the support email (`SUPPORT_EMAIL`) and a copyright line. The year is never hard-coded: the server renders the current year and the browser re-checks it on load, so it rolls over on 1 January with no manual change.
+
 The app icon lives in `src/app/` (`icon.svg` for modern browsers, `favicon.ico` with 16/32/48 px sizes, `apple-icon.png` for iOS home screens); Next.js adds the `<link>` tags automatically. The same mark appears next to the NowLMS logo in the header.
 
 ## Roles & permissions
@@ -109,6 +111,7 @@ Both suites cover the same scenarios:
 | `user-management` | Who can block whom, which roles each admin can create, blocking signs users out immediately and unblocking doesn't revive old sessions, status filter, audit entries |
 | `navbar` | Link order (Dashboard first), current-page highlight, first name above a smaller role |
 | `lessons` | Tutors upload/edit/reorder lessons in their own courses only, students can't manage lessons, admins edit lessons |
+| `footer` | Footer links and pages, signed-in links, current year rendered by the server, year rolling over on New Year's Day |
 | `favicon` | Favicon, SVG icon and Apple touch icon are linked and served; logo mark in the header |
 | `covers` | Built-in illustrations, uploaded covers compressed to small 960×540 WebP, replace/reset, non-images rejected |
 | `courses` | The 4 courses, lesson create/upload/reorder/delete, tutor assignment, enroll → watch → complete, tutor sees progress |

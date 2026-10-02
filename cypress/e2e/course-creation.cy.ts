@@ -15,7 +15,7 @@ describe("Course creation", () => {
     cy.contains("h2", "Cloud Engineering");
 
     cy.visit("/");
-    cy.contains("a", "Cloud Engineering");
+    cy.get("main").contains("a", "Cloud Engineering");
 
     ["cloud-engineering", "data-analytics"].forEach((slug) => {
       cy.visit(`/courses/${slug}`);
