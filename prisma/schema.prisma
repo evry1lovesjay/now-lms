@@ -1,0 +1,121 @@
+// Prisma schema for Now LMS.
+// SQLite is used for local development. To scale, switch `provider` to
+// "postgresql" and point DATABASE_URL at a Postgres instance (see README).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// role:   SUPERADMIN | CONTENT_ADMIN | TUTOR | STUDENT
+// status: ACTIVE | BLOCKED
+model User {
+  id             String    @id @default(cuid())
+  name           String
+  email          String    @unique
+  passwordHash   String
+  role           String    @default("STUDENT")
+  status         String    @default("ACTIVE")
+  // Bumped when an account is blocked so every existing session is revoked.
+  sessionVersion Int       @default(0)
+  blockedAt      DateTime?
+  blockedById    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  enrollments Enrollment[]
+  tutoring    CourseTutor[]
+  progress    LessonProgress[]
+  auditLogs   AuditLog[]       @relation("actor")
+
+  @@index([role, status])
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  summary     String
+  description String
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons     Lesson[]
+  enrollments Enrollment[]
+  tutors      CourseTutor[]
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  courseId    String
+  title       String
+  description String   @default("")
+  position    Int      @default(0)
+  // Storage key of the uploaded video (never a public URL).
+  videoKey    String?
+  videoType   String?
+  videoSize   Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course   Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
+
+  @@index([courseId, position])
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+}
+
+model CourseTutor {
+  id        String   @id @default(cuid())
+  tutorId   String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  tutor  User   @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([tutorId, courseId])
+  @@index([courseId])
+}
+
+model LessonProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  completedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String
+  action    String
+  targetId  String?
+  detail    String?
+  createdAt DateTime @default(now())
+
+  actor User @relation("actor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+}
