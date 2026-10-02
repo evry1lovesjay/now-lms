@@ -1,7 +1,20 @@
 @import "tailwindcss";
 
-/* Dark mode is class-based (<html class="dark">) so users can pick light, dark or system. */
-@custom-variant dark (&:where(.dark, .dark *));
+/*
+ * Dark mode: <html class="dark"> forces dark, <html class="light"> forces light,
+ * and no class follows the OS (prefers-color-scheme). The class comes from the
+ * theme cookie on the server, so pages render in the right theme with no script.
+ */
+@custom-variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not(.light), :root:not(.light) *) {
+      @slot;
+    }
+  }
+}
 
 @theme {
   --color-brand-50: #eef4ff;
@@ -21,23 +34,25 @@
  * dark. Brand tints used as light backgrounds and as link text are adjusted so
  * they keep their contrast. Status colours use explicit dark: variants.
  */
-.dark {
-  color-scheme: dark;
-  --color-slate-50: oklch(12.9% 0.042 264.695);
-  --color-slate-100: oklch(27.9% 0.041 260.031);
-  --color-slate-200: oklch(32% 0.042 258);
-  --color-slate-300: oklch(44.6% 0.043 257.281);
-  --color-slate-400: oklch(55.4% 0.046 257.417);
-  --color-slate-500: oklch(65% 0.04 256.788);
-  --color-slate-600: oklch(76% 0.03 254);
-  --color-slate-700: oklch(86.9% 0.022 252.894);
-  --color-slate-800: oklch(92.9% 0.013 255.508);
-  --color-slate-900: oklch(96.8% 0.007 247.896);
-  --color-slate-950: oklch(98.4% 0.003 247.858);
-  --color-surface: oklch(20.8% 0.042 265.755);
-  --color-brand-50: oklch(28.2% 0.091 267.935);
-  --color-brand-100: oklch(37.9% 0.146 265.522);
-  --color-brand-700: #9db8fb;
+:root {
+  @variant dark {
+    color-scheme: dark;
+    --color-slate-50: oklch(12.9% 0.042 264.695);
+    --color-slate-100: oklch(27.9% 0.041 260.031);
+    --color-slate-200: oklch(32% 0.042 258);
+    --color-slate-300: oklch(44.6% 0.043 257.281);
+    --color-slate-400: oklch(55.4% 0.046 257.417);
+    --color-slate-500: oklch(65% 0.04 256.788);
+    --color-slate-600: oklch(76% 0.03 254);
+    --color-slate-700: oklch(86.9% 0.022 252.894);
+    --color-slate-800: oklch(92.9% 0.013 255.508);
+    --color-slate-900: oklch(96.8% 0.007 247.896);
+    --color-slate-950: oklch(98.4% 0.003 247.858);
+    --color-surface: oklch(20.8% 0.042 265.755);
+    --color-brand-50: oklch(28.2% 0.091 267.935);
+    --color-brand-100: oklch(37.9% 0.146 265.522);
+    --color-brand-700: #9db8fb;
+  }
 }
 
 body {

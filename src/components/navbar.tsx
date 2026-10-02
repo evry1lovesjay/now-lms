@@ -3,8 +3,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { logout } from "@/actions/auth";
 import { ROLE_LABELS, canManageContent, homePathFor } from "@/lib/roles";
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { Theme } from "@/lib/theme";
 
-export async function Navbar() {
+export async function Navbar({ theme }: { theme: Theme }) {
   const user = await getCurrentUser();
 
   return (
@@ -14,7 +15,7 @@ export async function Navbar() {
           Now<span className="text-slate-900">LMS</span>
         </Link>
         <div className="flex flex-wrap items-center gap-4 text-sm">
-          <ThemeToggle />
+          <ThemeToggle initial={theme} />
           <Link href="/courses" className="text-slate-600 hover:text-slate-900">
             Courses
           </Link>
