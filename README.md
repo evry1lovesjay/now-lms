@@ -4,7 +4,7 @@ A simple, scalable ed-tech LMS built with **Next.js 16 (App Router)**, **Prisma 
 
 Courses offered: **Software Quality Assurance**, **Data Analytics**, **Product Management** and **Product Design** — and admins can add more.
 
-Light and dark themes are built in: the 🖥️/☀️/🌙 button in the header cycles System → Light → Dark and remembers the choice per browser.
+Light and dark themes are built in: pick System, Light or Dark from the account menu (click your name in the header; on phones, the ☰ menu). The choice is remembered per browser. Signed-out visitors get a compact theme button.
 
 ## Roles & permissions
 

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 export type NavLink = { href: string; label: string };
 
@@ -12,25 +11,33 @@ export function activeHref(links: NavLink[], pathname: string) {
     .sort((a, b) => b.href.length - a.href.length)[0]?.href;
 }
 
-/** Main navigation; the current section is highlighted and marked aria-current="page". */
-export function NavLinks({ links }: { links: NavLink[] }) {
-  const pathname = usePathname();
-  const active = activeHref(links, pathname);
-
+/** Navigation links; the current section is highlighted and marked aria-current="page". */
+export function NavLinks({
+  links,
+  active,
+  vertical = false,
+  onNavigate,
+}: {
+  links: NavLink[];
+  active: string | undefined;
+  vertical?: boolean;
+  onNavigate?: () => void;
+}) {
   return (
-    <ul className="flex flex-wrap items-center gap-1 text-sm">
+    <ul className={vertical ? "flex flex-col gap-1" : "flex items-center gap-1 text-sm"}>
       {links.map((link) => {
         const isActive = link.href === active;
         return (
           <li key={link.href}>
             <Link
               href={link.href}
+              onClick={onNavigate}
               aria-current={isActive ? "page" : undefined}
-              className={
+              className={`block rounded-lg px-3 ${vertical ? "py-2.5 text-base" : "py-1.5"} ${
                 isActive
-                  ? "rounded-lg bg-brand-600 px-3 py-1.5 font-semibold text-white shadow-sm"
-                  : "rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-              }
+                  ? "bg-brand-600 font-semibold text-white shadow-sm"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              }`}
             >
               {link.label}
             </Link>
