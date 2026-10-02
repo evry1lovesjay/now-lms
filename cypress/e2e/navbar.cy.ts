@@ -52,7 +52,7 @@ describe("Navbar", () => {
   it("keeps the theme choice and Log out in the user menu", () => {
     cy.login("student");
     cy.contains("button", "Log out").should("not.exist");
-    cy.get('button[aria-label^="Account menu for Demo"]').as("trigger").should("have.attr", "aria-expanded", "false");
+    cy.hydrated('button[aria-label^="Account menu for Demo"]').as("trigger").should("have.attr", "aria-expanded", "false");
     cy.get("@trigger").click();
     cy.get("@trigger").should("have.attr", "aria-expanded", "true");
     cy.get('[data-testid="user-menu"] [role="radio"]').then(($r) => {
@@ -79,7 +79,7 @@ describe("Navbar", () => {
     cy.viewport(390, 844);
     cy.login("student");
     cy.get('button[aria-label^="Account menu"]').should("not.be.visible");
-    cy.get('button[aria-label="Open menu"]').should("be.visible").click();
+    cy.hydrated('button[aria-label="Open menu"]').should("be.visible").click();
     cy.get('button[aria-label="Close menu"]').should("have.attr", "aria-expanded", "true");
     cy.get('[data-testid="mobile-menu"] li').then(($li) => {
       expect([...$li].map((li) => li.textContent?.trim())).to.deep.equal(["Dashboard", "Courses", "Assignments"]);
@@ -91,7 +91,7 @@ describe("Navbar", () => {
     cy.location("pathname").should("eq", "/courses");
     cy.get('[data-testid="mobile-menu"]').should("not.exist");
 
-    cy.get('button[aria-label="Open menu"]').click();
+    cy.hydrated('button[aria-label="Open menu"]').click();
     cy.get('[data-testid="mobile-menu"] [aria-current="page"]').should("have.text", "Courses");
     cy.get('[data-testid="mobile-menu"]').contains("button", "Log out").click();
     cy.location("pathname").should("eq", "/login");
@@ -100,7 +100,7 @@ describe("Navbar", () => {
   it("shows signed-out visitors Courses, Log in and Sign up on small screens", () => {
     cy.viewport(390, 844);
     cy.visit("/");
-    cy.get('button[aria-label="Open menu"]').click();
+    cy.hydrated('button[aria-label="Open menu"]').click();
     cy.get('[data-testid="mobile-menu"] li').then(($li) => {
       expect([...$li].map((li) => li.textContent?.trim())).to.deep.equal(["Courses", "Log in"]);
     });

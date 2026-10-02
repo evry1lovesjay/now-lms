@@ -6,6 +6,11 @@ declare global {
     interface Chainable {
       /** Signs in through the login form as a seeded account or explicit credentials. */
       login(who: AccountName | { email: string; password: string }): Chainable<void>;
+      /**
+       * Gets an element once React has hydrated it (its event handlers are attached).
+       * Clicking a server-rendered button before that does nothing.
+       */
+      hydrated(selector: string): Chainable<JQuery<HTMLElement>>;
       /** Fills the login form without asserting success. */
       attemptLogin(email: string, password: string): Chainable<void>;
       /** Clears the session cookie so the next login starts fresh. */
@@ -25,6 +30,15 @@ declare global {
     }
   }
 }
+
+Cypress.Commands.add("hydrated", (selector) =>
+  cy.get(selector).should(($el) => {
+    expect(
+      Object.keys($el[0]).some((key) => key.startsWith("__reactProps$")),
+      `${selector} is hydrated`,
+    ).to.equal(true);
+  }),
+);
 
 Cypress.Commands.add("attemptLogin", (email, password) => {
   cy.visit("/login");
