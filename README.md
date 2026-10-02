@@ -2,7 +2,9 @@
 
 A simple, scalable ed-tech LMS built with **Next.js 16 (App Router)**, **Prisma 7**, **Tailwind CSS 4** and TypeScript.
 
-Courses offered: **Software Quality Assurance**, **Data Analytics**, **Product Management** and **Product Design**.
+Courses offered: **Software Quality Assurance**, **Data Analytics**, **Product Management** and **Product Design** — and admins can add more.
+
+Light and dark themes are built in: the 🖥️/☀️/🌙 button in the header cycles System → Light → Dark and remembers the choice per browser.
 
 ## Roles & permissions
 
@@ -12,16 +14,36 @@ Courses offered: **Software Quality Assurance**, **Data Analytics**, **Product M
 | Block / unblock **tutors & students** | ✅ | ✅ | – | – |
 | Create content admin accounts | ✅ | – | – | – |
 | Create tutor / student accounts | ✅ | ✅ | – | – |
+| Create courses | ✅ | ✅ | – | – |
 | Edit courses, add/reorder/delete lessons, upload videos | ✅ | ✅ | – | – |
+| Post to course outline / materials / resources | all courses | all courses | assigned courses | – |
+| Post, delete and grade assignments | all courses | all courses | assigned courses | – |
 | Assign tutors to courses | ✅ | ✅ | – | – |
 | View audit log | ✅ | – | – | – |
 | Watch lessons | all courses | all courses | assigned courses | enrolled courses |
 | See students' progress | via admin | via admin | assigned courses | – |
 | Self sign-up, enroll, mark lessons complete | – | – | – | ✅ |
+| See assignments, submit work, see grades & feedback | – | – | – | enrolled courses |
 
 Nobody can block a super admin, and nobody can change their own status. The rules live in one place: [`src/lib/roles.ts`](src/lib/roles.ts).
 
 **Blocking is immediate**: every page, server action and API route re-reads the user from the database, so a blocked user is signed out on their next request (including mid-video — the stream stops authorising).
+
+## Course outline, materials & resources
+
+Every course — existing or newly created — has the same three fixed sections, shown colour-coded **above the lessons**:
+
+| Section | Colour | Accepts |
+|---|---|---|
+| 📋 Course outline | amber | PDF, Word (.doc/.docx), slides (.ppt/.pptx) or a link |
+| 📚 Course materials | blue | PDF or a link |
+| 🔗 Resources | green | Links (e.g. Google Meet live class, YouTube recordings) |
+
+All three are optional and can hold multiple items. Super admins, content admins and the course's tutors post from the course page with a **"What do you want to add?"** dropdown. Links are labelled automatically (Google Meet/Zoom/Teams → *Live class*, YouTube/Vimeo/Loom → *Video*, Google Drive). The outline is visible to anyone browsing a published course; materials and resources need course access. The sections are defined once in [`src/lib/course-content.ts`](src/lib/course-content.ts), which is what keeps every course consistent.
+
+## Assignments
+
+Tutors (for their courses), content admins and super admins post assignments with instructions, an optional due date and a max score. Enrolled students submit an answer, a link and/or a file (PDF, Word, slides, Excel, ZIP or image, up to 25 MB), and can update it until it's graded. Teachers see every enrolled student's submission and grade it with feedback; students see their grades per course and across all courses on **My assignments & grades**. Late submissions are flagged; submission files are only visible to the student and the course's teachers.
 
 ## Video protection (non-downloadable)
 
@@ -75,6 +97,10 @@ Both suites cover the same scenarios:
 | `auth` | Student sign-up, login errors, role-based dashboards, anonymous/role redirects, audit log is super-admin only |
 | `user-management` | Who can block whom, which roles each admin can create, blocking signs users out immediately and unblocking doesn't revive old sessions, status filter, audit entries |
 | `courses` | The 4 courses, lesson create/upload/reorder/delete, tutor assignment, enroll → watch → complete, tutor sees progress |
+| `course-creation` | Admins create courses (unique slugs), new and existing courses have identical sections, tutors/students can't create |
+| `course-content` | The 3-option dropdown, link-only resources, posting and colour-coded display above lessons, public outline vs. gated materials, tutor scope, unsafe links rejected, removal |
+| `assignments` | Post → submit (text/link/file) → grade → student sees grade & overall score, resubmit before grading, private submission files, access rules |
+| `dark-mode` | Toggle cycles and persists, applied before first paint, follows the OS on System |
 | `video-protection` | Range streaming with no-store headers, direct-tab access refused, signed-out and copied links refused, non-enrolled students kept out, blocking cuts the stream |
 
 ```
@@ -101,7 +127,9 @@ src/
     roles.ts             # role & permission rules (single source of truth)
     auth.ts              # JWT session cookie, getCurrentUser(), requireUser()
     access.ts            # who can watch which course
-    storage.ts           # video storage (local disk; swap for S3/R2/GCS)
+    storage.ts           # video + document storage (local disk; swap for S3/R2/GCS)
+    course-content.ts    # the 3 fixed course sections (outline, materials, resources)
+    file-types.ts        # allowed upload types, link validation
     video-token.ts       # short-lived per-user video tokens
   actions/               # server actions: auth, users, content, learning
   app/
@@ -117,7 +145,7 @@ src/
 
 - **Database**: SQLite for development. For production, change `provider = "postgresql"` in `prisma/schema.prisma`, install `@prisma/adapter-pg`, swap the adapter in `src/lib/db.ts`, and set `DATABASE_URL`. Queries are indexed and the user list is paginated.
 - **Stateless app servers**: sessions are signed JWT cookies, so you can run many instances behind a load balancer.
-- **Video storage**: replace the four functions in `src/lib/storage.ts` with an object store (S3/R2/GCS) and put a CDN with signed URLs in front — uploads already stream rather than buffer.
+- **File storage**: videos and documents go through the small bucket API in `src/lib/storage.ts`; replace it with an object store (S3/R2/GCS) and put a CDN with signed URLs in front — uploads already stream rather than buffer.
 - **More courses**: courses are data, not code. The 4 courses are seeded; adding more is an insert (or a small "create course" form) away.
 - **Auditing**: block/unblock, user creation and content changes are recorded in `AuditLog`.
 

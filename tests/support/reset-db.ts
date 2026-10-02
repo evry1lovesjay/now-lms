@@ -20,6 +20,9 @@ async function main() {
   try {
     await db.$transaction([
       db.auditLog.deleteMany(),
+      db.submission.deleteMany(),
+      db.assignment.deleteMany(),
+      db.courseContent.deleteMany(),
       db.lessonProgress.deleteMany(),
       db.enrollment.deleteMany(),
       db.courseTutor.deleteMany(),
@@ -28,6 +31,7 @@ async function main() {
       db.user.deleteMany(),
     ]);
     await rm(path.resolve(testEnv.VIDEO_STORAGE_DIR), { recursive: true, force: true });
+    await rm(path.resolve(testEnv.DOCUMENT_STORAGE_DIR), { recursive: true, force: true });
 
     execSync("npx tsx prisma/seed.ts", { env: withTestEnv({ NODE_ENV: "test" }), stdio: "ignore" });
 

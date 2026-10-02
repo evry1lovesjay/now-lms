@@ -1,11 +1,43 @@
 @import "tailwindcss";
 
+/* Dark mode is class-based (<html class="dark">) so users can pick light, dark or system. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand-50: #eef4ff;
   --color-brand-100: #dbe6fe;
+  --color-brand-300: #9db8fb;
   --color-brand-500: #3b6cf6;
   --color-brand-600: #2554e8;
   --color-brand-700: #1d43c4;
+  --color-brand-800: #1a389e;
+  /* Card / input background. */
+  --color-surface: #fff;
+}
+
+/*
+ * Dark theme: the slate scale is mirrored so every existing slate utility
+ * (backgrounds, borders, text) flips automatically, and the surface token turns
+ * dark. Brand tints used as light backgrounds and as link text are adjusted so
+ * they keep their contrast. Status colours use explicit dark: variants.
+ */
+.dark {
+  color-scheme: dark;
+  --color-slate-50: oklch(12.9% 0.042 264.695);
+  --color-slate-100: oklch(27.9% 0.041 260.031);
+  --color-slate-200: oklch(32% 0.042 258);
+  --color-slate-300: oklch(44.6% 0.043 257.281);
+  --color-slate-400: oklch(55.4% 0.046 257.417);
+  --color-slate-500: oklch(65% 0.04 256.788);
+  --color-slate-600: oklch(76% 0.03 254);
+  --color-slate-700: oklch(86.9% 0.022 252.894);
+  --color-slate-800: oklch(92.9% 0.013 255.508);
+  --color-slate-900: oklch(96.8% 0.007 247.896);
+  --color-slate-950: oklch(98.4% 0.003 247.858);
+  --color-surface: oklch(20.8% 0.042 265.755);
+  --color-brand-50: oklch(28.2% 0.091 267.935);
+  --color-brand-100: oklch(37.9% 0.146 265.522);
+  --color-brand-700: #9db8fb;
 }
 
 body {
@@ -16,23 +48,29 @@ body {
   @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
 }
 @utility btn-primary {
-  @apply btn bg-brand-600 text-white hover:bg-brand-700;
+  @apply btn bg-brand-600 text-white hover:bg-brand-800;
 }
 @utility btn-secondary {
-  @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-100;
+  @apply btn border border-slate-300 bg-surface text-slate-700 hover:bg-slate-100;
 }
 @utility btn-danger {
   @apply btn bg-red-600 text-white hover:bg-red-700;
 }
 @utility input {
-  @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+  @apply w-full rounded-lg border border-slate-300 bg-surface px-3 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
 }
 @utility label {
   @apply mb-1 block text-sm font-medium text-slate-700;
 }
 @utility card {
-  @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+  @apply rounded-xl border border-slate-200 bg-surface p-6 shadow-sm;
 }
 @utility badge {
   @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+@utility alert-error {
+  @apply rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/15 dark:text-red-300;
+}
+@utility alert-success {
+  @apply rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-500/15 dark:text-green-300;
 }

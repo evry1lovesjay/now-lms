@@ -10,7 +10,13 @@ export default async function AdminCoursesPage() {
   });
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Link href="/admin/courses/new" className="btn-primary">
+          + New course
+        </Link>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
       {courses.map((c) => (
         <Link key={c.id} href={`/admin/courses/${c.id}`} className="card block hover:border-brand-500">
           <div className="flex items-start justify-between gap-2">
@@ -23,6 +29,7 @@ export default async function AdminCoursesPage() {
           </p>
         </Link>
       ))}
+      </div>
     </div>
   );
 }

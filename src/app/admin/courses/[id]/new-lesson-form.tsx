@@ -53,7 +53,7 @@ export function NewLessonForm({ courseId }: { courseId: string }) {
         <label className="label" htmlFor="lesson-video">Video (MP4, WebM, OGG or MOV)</label>
         <input className="input" id="lesson-video" name="video" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime" />
       </div>
-      {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="alert-error">{error}</p>}
       {progress !== null && (
         <div className="h-2 overflow-hidden rounded-full bg-slate-200">
           <div className="h-full bg-brand-600 transition-all" style={{ width: `${progress}%` }} />

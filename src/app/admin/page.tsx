@@ -27,7 +27,7 @@ export default async function AdminOverview() {
         ))}
         <Link href="/admin/users?status=BLOCKED" className="card hover:border-red-300">
           <p className="text-sm text-slate-500">Blocked accounts</p>
-          <p className="text-3xl font-semibold text-red-600">{blocked}</p>
+          <p className="text-3xl font-semibold text-red-600 dark:text-red-400">{blocked}</p>
         </Link>
       </div>
 
