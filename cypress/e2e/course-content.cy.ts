@@ -71,7 +71,7 @@ describe("Course outline, materials & resources", () => {
     cy.login("contentAdmin");
     cy.visit("/admin/courses");
     // The tutor's own course: even there, outline/materials/resources are admin-only.
-    cy.contains("a", "Software Quality Assurance")
+    cy.get("main").contains("a", "Software Quality Assurance")
       .invoke("attr", "href")
       .then((href) => {
         const courseId = String(href).split("/").pop();

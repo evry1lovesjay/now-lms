@@ -19,6 +19,6 @@ test("every page links a favicon, an SVG icon and an Apple touch icon, and serve
 
 test("the navbar logo shows the same mark", async ({ page }) => {
   await page.goto("/courses");
-  const logo = page.getByRole("link", { name: "NowLMS" });
+  const logo = page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "NowLMS" });
   await expect(logo.locator('svg[aria-hidden="true"]')).toBeVisible();
 });

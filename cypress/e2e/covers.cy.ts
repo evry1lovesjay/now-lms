@@ -60,7 +60,7 @@ describe("Course covers", () => {
   it("lets admins replace a cover and go back to the built-in illustration", () => {
     cy.login("superadmin");
     cy.visit("/admin/courses");
-    cy.contains("a", "Data Analytics").click();
+    cy.get("main").contains("a", "Data Analytics").click();
     cy.get("#course-cover").selectFile(FIXTURE);
     cy.contains("button", "Save course").click();
     cy.contains("Course saved.");
@@ -68,7 +68,7 @@ describe("Course covers", () => {
     cy.get("header img").first().should("have.attr", "src").and("match", /^\/api\/course-covers\//);
 
     cy.visit("/admin/courses");
-    cy.contains("a", "Data Analytics").click();
+    cy.get("main").contains("a", "Data Analytics").click();
     cy.contains("label", "Use the built-in illustration instead").find("input").check();
     cy.contains("button", "Save course").click();
     cy.contains("Course saved.");

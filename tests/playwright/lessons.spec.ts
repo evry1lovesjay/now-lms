@@ -70,7 +70,7 @@ test("students cannot open lesson management", async ({ page }) => {
 test("admins can edit lessons from the admin course page", async ({ page }) => {
   await login(page, "contentAdmin");
   await page.goto("/admin/courses");
-  await page.getByRole("link", { name: /Software Quality Assurance/ }).click();
+  await page.getByRole("main").getByRole("link", { name: /Software Quality Assurance/ }).click();
   const row = page.locator(`li[data-lesson='${SEEDED_LESSON_TITLE}']`);
   await row.getByRole("button", { name: "Edit" }).click();
   await row.getByLabel("Title").fill("Welcome to QA");

@@ -19,7 +19,7 @@ test("content admin creates a course that gets the same fixed sections as every 
   await expect(page.getByRole("heading", { name: "Cloud Engineering" })).toBeVisible();
 
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Cloud Engineering" })).toBeVisible();
+  await expect(page.getByRole("main").getByRole("link", { name: "Cloud Engineering" })).toBeVisible();
 
   // New and existing courses show the same three sections, in the same order.
   for (const slug of ["cloud-engineering", "data-analytics"]) {

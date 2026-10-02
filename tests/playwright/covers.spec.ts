@@ -62,7 +62,7 @@ test("an uploaded cover is resized and compressed to a small WebP", async ({ pag
 test("admins can replace a cover and go back to the built-in illustration", async ({ page }) => {
   await login(page, "superadmin");
   await page.goto("/admin/courses");
-  await page.getByRole("link", { name: /Data Analytics/ }).click();
+  await page.getByRole("main").getByRole("link", { name: /Data Analytics/ }).click();
 
   await page.getByLabel(/^Cover image/).setInputFiles(FIXTURE);
   await page.getByRole("button", { name: "Save course" }).click();
@@ -71,7 +71,7 @@ test("admins can replace a cover and go back to the built-in illustration", asyn
   await expect(page.locator("header img").first()).toHaveAttribute("src", /^\/api\/course-covers\//);
 
   await page.goto("/admin/courses");
-  await page.getByRole("link", { name: /Data Analytics/ }).click();
+  await page.getByRole("main").getByRole("link", { name: /Data Analytics/ }).click();
   await page.getByLabel("Use the built-in illustration instead").check();
   await page.getByRole("button", { name: "Save course" }).click();
   await expect(page.getByText("Course saved.")).toBeVisible();
