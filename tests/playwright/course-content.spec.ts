@@ -34,7 +34,7 @@ async function postSqaBasics(page: Page) {
 }
 
 test("the composer offers exactly the three sections, and resources only take links", async ({ page }) => {
-  await login(page, "tutor");
+  await login(page, "contentAdmin");
   await page.goto(SQA);
   const composer = page.getByTestId("content-composer");
   await expect(composer.getByLabel("What do you want to add?").locator("option:not([disabled])")).toHaveText([
@@ -48,10 +48,10 @@ test("the composer offers exactly the three sections, and resources only take li
   await expect(composer.getByLabel("Upload a file")).toBeVisible();
 });
 
-test("assigned tutor posts outline, materials and resources; learners see them colour-coded above the lessons", async ({
+test("admins post outline, materials and resources; learners see them colour-coded above the lessons", async ({
   page,
 }) => {
-  await login(page, "tutor");
+  await login(page, "contentAdmin");
   await postSqaBasics(page);
   await expect(section(page, "RESOURCES")).toContainText("Live class");
   await expect(section(page, "RESOURCES")).toContainText("Video");
@@ -94,17 +94,20 @@ test("outline files are public; materials files need course access", async ({ pa
   await anon.dispose();
 });
 
-test("tutors can only post to courses they are assigned to; unsafe links are rejected", async ({ page }) => {
+test("tutors cannot post course content, even to their own course; unsafe links are rejected", async ({ page }) => {
   await login(page, "tutor");
+  // Demo Tutor is assigned to SQA, but outline/materials/resources are admin-only.
+  await page.goto("/courses/software-quality-assurance");
+  await expect(page.getByTestId("content-composer")).toHaveCount(0);
   await page.goto("/courses/data-analytics");
   await expect(page.getByTestId("content-composer")).toHaveCount(0);
 
-  // Find the Data Analytics course id from the admin listing as a content admin.
+  // Find the SQA course id (the tutor's own course) from the admin listing as a content admin.
   const admin = await page.context().browser()!.newContext();
   const adminPage = await admin.newPage();
   await login(adminPage, "contentAdmin");
   await adminPage.goto("/admin/courses");
-  const href = await adminPage.getByRole("link", { name: /Data Analytics/ }).getAttribute("href");
+  const href = await adminPage.getByRole("link", { name: /Software Quality Assurance/ }).getAttribute("href");
   const courseId = href!.split("/").pop();
 
   const res = await page.request.post(`/api/courses/${courseId}/content`, {

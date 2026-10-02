@@ -15,7 +15,7 @@ test("content admin creates a course that gets the same fixed sections as every 
   await page.getByLabel("Description").fill("AWS, containers and infrastructure as code.");
   await page.getByRole("button", { name: "Create course" }).click();
 
-  await expect(page).toHaveURL(/\/admin\/courses\/[^/]+$/);
+  await expect(page).toHaveURL(/\/admin\/courses\/(?!new$)[^/]+$/);
   await expect(page.getByRole("heading", { name: "Cloud Engineering" })).toBeVisible();
 
   await page.goto("/");
@@ -39,7 +39,7 @@ test("super admin can create a course; duplicate titles get a unique address", a
     await page.getByLabel("Summary").fill("Protect systems and data.");
     await page.getByLabel("Description").fill("Threats, defence and incident response.");
     await page.getByRole("button", { name: "Create course" }).click();
-    await expect(page).toHaveURL(/\/admin\/courses\/[^/]+$/);
+    await expect(page).toHaveURL(/\/admin\/courses\/(?!new$)[^/]+$/);
   }
   await page.goto("/courses/cyber-security");
   await expect(page.getByRole("heading", { name: "Cyber Security" })).toBeVisible();

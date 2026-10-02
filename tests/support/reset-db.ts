@@ -32,6 +32,7 @@ async function main() {
     ]);
     await rm(path.resolve(testEnv.VIDEO_STORAGE_DIR), { recursive: true, force: true });
     await rm(path.resolve(testEnv.DOCUMENT_STORAGE_DIR), { recursive: true, force: true });
+    await rm(path.resolve(testEnv.COVER_STORAGE_DIR), { recursive: true, force: true });
 
     execSync("npx tsx prisma/seed.ts", { env: withTestEnv({ NODE_ENV: "test" }), stdio: "ignore" });
 

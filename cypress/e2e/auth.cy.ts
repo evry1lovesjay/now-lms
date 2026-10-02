@@ -8,7 +8,7 @@ describe("Authentication & routing", () => {
 
     cy.location("pathname").should("eq", "/student");
     cy.contains("Hi New");
-    cy.contains("New Learner · Student");
+    cy.get('[data-testid="nav-user"]').invoke("text").should("match", /^New\s*Student$/);
   });
 
   it("rejects registering with an existing email", () => {

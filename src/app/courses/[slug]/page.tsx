@@ -9,6 +9,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { ProgressBar } from "@/components/badges";
 import { CourseSections } from "@/components/course-sections";
 import { ContentComposer } from "@/components/content-composer";
+import { coverUrl } from "@/lib/course-cover";
 
 export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -53,6 +54,15 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
     <div className="grid gap-8 lg:grid-cols-3">
       <div className="space-y-6 lg:col-span-2">
         <header className="space-y-2">
+          {/* eslint-disable-next-line @next/next/no-img-element -- covers are pre-sized WebP/SVG */}
+          <img
+            src={coverUrl(course)}
+            alt=""
+            width={960}
+            height={540}
+            decoding="async"
+            className="mb-4 aspect-[16/6] w-full rounded-xl object-cover"
+          />
           <h1 className="text-3xl font-bold">{course.title}</h1>
           <p className="text-lg text-slate-600">{course.summary}</p>
           {course.tutors.length > 0 && (
@@ -60,7 +70,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
           )}
         </header>
 
-        <CourseSections items={course.content} canAccess={hasAccess} canEdit={canTeach} />
+        <CourseSections items={course.content} canAccess={hasAccess} canEdit={isAdmin} />
 
         <section className="card" aria-labelledby="lessons-heading">
           <h2 id="lessons-heading" className="mb-3 font-semibold">
@@ -118,14 +128,19 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
               )}
             </Link>
           )}
+          {canTeach && (
+            <Link href={`/courses/${course.slug}/manage`} className="btn-secondary w-full">
+              🎬 Manage lessons
+            </Link>
+          )}
           {isAdmin && (
             <Link href={`/admin/courses/${course.id}`} className="btn-secondary w-full">
-              Manage lessons & tutors
+              Course settings & tutors
             </Link>
           )}
         </div>
 
-        {canTeach && <ContentComposer courseId={course.id} />}
+        {isAdmin && <ContentComposer courseId={course.id} />}
       </aside>
     </div>
   );

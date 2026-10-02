@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { canTeachCourse } from "@/lib/access";
+import { canManageContent } from "@/lib/roles";
 import { audit } from "@/lib/audit";
 import { sectionByKey } from "@/lib/course-content";
 import { normalizeUrl } from "@/lib/file-types";
@@ -16,7 +16,7 @@ function fail(error: string, status = 400) {
 
 /**
  * Adds an item to one of a course's fixed sections (outline, materials,
- * resources). Allowed for super admins, content admins and the course's tutors.
+ * resources). Allowed for super admins and content admins.
  * Body: multipart form with section, kind (LINK | FILE), title, and url or file.
  */
 export async function POST(request: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {
@@ -24,9 +24,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const user = await getCurrentUser();
   if (!user) return fail("Not signed in.", 401);
 
+  if (!canManageContent(user.role)) return fail("Only admins can post course content.", 403);
   const course = await db.course.findUnique({ where: { id: courseId }, select: { id: true, slug: true } });
   if (!course) return fail("Course not found.", 404);
-  if (!(await canTeachCourse(user, course.id))) return fail("You cannot post to this course.", 403);
 
   let form: FormData;
   try {

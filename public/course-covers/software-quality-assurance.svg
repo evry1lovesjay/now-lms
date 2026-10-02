@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Software testing illustration">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#0f766e"/></linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#bg)"/>
+  <circle cx="560" cy="60" r="120" fill="#fff" opacity=".07"/>
+  <circle cx="70" cy="330" r="90" fill="#fff" opacity=".06"/>
+  <!-- browser window with test checklist -->
+  <rect x="90" y="70" width="300" height="220" rx="14" fill="#fff"/>
+  <rect x="90" y="70" width="300" height="34" rx="14" fill="#d1fae5"/>
+  <rect x="90" y="90" width="300" height="14" fill="#d1fae5"/>
+  <circle cx="112" cy="87" r="5" fill="#f87171"/><circle cx="128" cy="87" r="5" fill="#fbbf24"/><circle cx="144" cy="87" r="5" fill="#34d399"/>
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="6">
+    <path d="M118 140l10 10 18-20" stroke="#059669"/>
+    <path d="M118 190l10 10 18-20" stroke="#059669"/>
+    <path d="M120 232l22 22M142 232l-22 22" stroke="#ef4444"/>
+  </g>
+  <rect x="166" y="132" width="170" height="12" rx="6" fill="#a7f3d0"/>
+  <rect x="166" y="182" width="140" height="12" rx="6" fill="#a7f3d0"/>
+  <rect x="166" y="236" width="155" height="12" rx="6" fill="#fecaca"/>
+  <!-- magnifier over a bug -->
+  <circle cx="460" cy="190" r="66" fill="#ecfdf5" stroke="#fff" stroke-width="14"/>
+  <path d="M507 237l52 52" stroke="#fff" stroke-width="20" stroke-linecap="round"/>
+  <ellipse cx="460" cy="198" rx="22" ry="28" fill="#0f766e"/>
+  <circle cx="460" cy="164" r="13" fill="#0f766e"/>
+  <g stroke="#0f766e" stroke-width="5" stroke-linecap="round">
+    <path d="M438 188l-18-8M438 206h-20M440 222l-16 12M482 188l18-8M482 206h20M480 222l16 12M452 154l-8-12M468 154l8-12"/>
+  </g>
+  <path d="M460 176v48" stroke="#ecfdf5" stroke-width="3"/>
+</svg>

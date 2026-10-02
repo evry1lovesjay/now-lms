@@ -1,27 +1,30 @@
 import "server-only";
 import { createReadStream, createWriteStream } from "node:fs";
-import { mkdir, rm, stat } from "node:fs/promises";
+import { mkdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { randomUUID } from "node:crypto";
+import sharp from "sharp";
 import { DOC_TYPES, MAX_DOCUMENT_MB, extensionOf, type DocExt } from "@/lib/file-types";
+import { COVER_HEIGHT, COVER_WIDTH, MAX_COVER_UPLOAD_MB } from "@/lib/course-cover";
 
 /**
  * File storage. Files live outside /public, so the only way to reach them is
  * through authenticated routes (/api/videos/…, /api/files/…).
  *
- * Two buckets: lesson videos and documents (course outlines, materials and
- * assignment submissions). This is a local-disk implementation. To scale
+ * Three buckets: lesson videos, documents (course outlines, materials and
+ * assignment submissions) and course cover images. This is a local-disk implementation. To scale
  * horizontally, replace these functions with an object store (S3/R2/GCS)
  * using the same signatures — callers only deal with opaque storage keys.
  */
 
-type Bucket = "videos" | "documents";
+type Bucket = "videos" | "documents" | "covers";
 
 const BUCKET_DIRS: Record<Bucket, () => string> = {
   videos: () => process.env.VIDEO_STORAGE_DIR ?? "./storage/videos",
   documents: () => process.env.DOCUMENT_STORAGE_DIR ?? "./storage/documents",
+  covers: () => process.env.COVER_STORAGE_DIR ?? "./storage/covers",
 };
 
 function resolveKey(bucket: Bucket, key: string) {
@@ -119,3 +122,38 @@ export async function documentSize(key: string) {
 }
 
 export const openDocument = (key: string) => open("documents", key);
+
+// ---------------------------------------------------------------- covers
+
+/**
+ * Saves a course cover. Whatever the upload (JPEG, PNG, WebP, GIF, AVIF…), it is
+ * re-encoded to a 960×540 WebP of typically 30–90 KB, so covers never slow pages down.
+ * Returns the stored size in bytes.
+ */
+export async function saveCover(file: File, courseId: string) {
+  if (file.size > MAX_COVER_UPLOAD_MB * 1024 * 1024) {
+    throw new UploadTooLargeError(`Cover images can be at most ${MAX_COVER_UPLOAD_MB} MB`);
+  }
+  let image: Buffer;
+  try {
+    image = await sharp(Buffer.from(await file.arrayBuffer()), { limitInputPixels: 50_000_000 })
+      .rotate() // respect camera orientation
+      .resize(COVER_WIDTH, COVER_HEIGHT, { fit: "cover", position: "attention" })
+      .webp({ quality: 72 })
+      .toBuffer();
+  } catch {
+    throw new UnsupportedFileError("Upload a JPEG, PNG, WebP or GIF image.");
+  }
+  const target = resolveKey("covers", `${courseId}.webp`);
+  await mkdir(path.dirname(target), { recursive: true });
+  await writeFile(target, image);
+  return image.length;
+}
+
+export async function coverSize(courseId: string) {
+  return (await stat(resolveKey("covers", `${courseId}.webp`))).size;
+}
+
+export const openCover = (courseId: string) => open("covers", `${courseId}.webp`);
+
+export const deleteCover = (courseId: string) => remove("covers", `${courseId}.webp`);

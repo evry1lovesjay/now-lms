@@ -15,8 +15,9 @@ Light and dark themes are built in: the 🖥️/☀️/🌙 button in the header
 | Create content admin accounts | ✅ | – | – | – |
 | Create tutor / student accounts | ✅ | ✅ | – | – |
 | Create courses | ✅ | ✅ | – | – |
-| Edit courses, add/reorder/delete lessons, upload videos | ✅ | ✅ | – | – |
-| Post to course outline / materials / resources | all courses | all courses | assigned courses | – |
+| Edit course details and cover image | ✅ | ✅ | – | – |
+| Add, edit, reorder and delete lessons; upload videos | all courses | all courses | assigned courses | – |
+| Post to course outline / materials / resources | all courses | all courses | – | – |
 | Post, delete and grade assignments | all courses | all courses | assigned courses | – |
 | Assign tutors to courses | ✅ | ✅ | – | – |
 | View audit log | ✅ | – | – | – |
@@ -39,7 +40,15 @@ Every course — existing or newly created — has the same three fixed sections
 | 📚 Course materials | blue | PDF or a link |
 | 🔗 Resources | green | Links (e.g. Google Meet live class, YouTube recordings) |
 
-All three are optional and can hold multiple items. Super admins, content admins and the course's tutors post from the course page with a **"What do you want to add?"** dropdown. Links are labelled automatically (Google Meet/Zoom/Teams → *Live class*, YouTube/Vimeo/Loom → *Video*, Google Drive). The outline is visible to anyone browsing a published course; materials and resources need course access. The sections are defined once in [`src/lib/course-content.ts`](src/lib/course-content.ts), which is what keeps every course consistent.
+All three are optional and can hold multiple items. Super admins and content admins post from the course page with a **"What do you want to add?"** dropdown. Links are labelled automatically (Google Meet/Zoom/Teams → *Live class*, YouTube/Vimeo/Loom → *Video*, Google Drive). The outline is visible to anyone browsing a published course; materials and resources need course access. The sections are defined once in [`src/lib/course-content.ts`](src/lib/course-content.ts), which is what keeps every course consistent.
+
+## Lessons
+
+Admins manage lessons on the admin course page; tutors do the same for their assigned courses from **Manage lessons** (on the course page or the tutor dashboard, at `/courses/<slug>/manage`). Lessons can be added with a video, edited (title and description), reordered, given a new video, or deleted.
+
+## Course cover images
+
+Every course card and course page shows a cover. The four original courses ship with small SVG illustrations (`public/course-covers/`, about 2 KB each), and new courses without an upload get a generic one. Admins can upload a cover when creating a course or later in its details (JPEG, PNG, WebP, GIF or AVIF, up to 5 MB). Uploads are resized to 960×540 and re-encoded as WebP with `sharp` (typically 15–90 KB), stored in `COVER_STORAGE_DIR`, and served with long-lived cache headers. Card images are lazy-loaded with fixed dimensions, so they never shift the layout.
 
 ## Assignments
 
@@ -96,9 +105,12 @@ Both suites cover the same scenarios:
 |---|---|
 | `auth` | Student sign-up, login errors, role-based dashboards, anonymous/role redirects, audit log is super-admin only |
 | `user-management` | Who can block whom, which roles each admin can create, blocking signs users out immediately and unblocking doesn't revive old sessions, status filter, audit entries |
+| `navbar` | Link order (Dashboard first), current-page highlight, first name above a smaller role |
+| `lessons` | Tutors upload/edit/reorder lessons in their own courses only, students can't manage lessons, admins edit lessons |
+| `covers` | Built-in illustrations, uploaded covers compressed to small 960×540 WebP, replace/reset, non-images rejected |
 | `courses` | The 4 courses, lesson create/upload/reorder/delete, tutor assignment, enroll → watch → complete, tutor sees progress |
 | `course-creation` | Admins create courses (unique slugs), new and existing courses have identical sections, tutors/students can't create |
-| `course-content` | The 3-option dropdown, link-only resources, posting and colour-coded display above lessons, public outline vs. gated materials, tutor scope, unsafe links rejected, removal |
+| `course-content` | The 3-option dropdown, link-only resources, posting and colour-coded display above lessons, public outline vs. gated materials, tutors can't post (even to their own course), unsafe links rejected, removal |
 | `assignments` | Post → submit (text/link/file) → grade → student sees grade & overall score, resubmit before grading, private submission files, access rules |
 | `dark-mode` | Toggle cycles and persists, applied before first paint, follows the OS on System |
 | `video-protection` | Range streaming with no-store headers, direct-tab access refused, signed-out and copied links refused, non-enrolled students kept out, blocking cuts the stream |
